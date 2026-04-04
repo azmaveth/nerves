@@ -36,8 +36,8 @@ defmodule Nerves.MixProject do
     [extra_applications: [:ssl, :inets, :eex, :nerves_bootstrap]]
   end
 
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
+  defp elixirc_paths(:test), do: ["lib", "compat", "test/support"]
+  defp elixirc_paths(_), do: ["lib", "compat"]
 
   def cli do
     [preferred_envs: %{docs: :docs, credo: :dev, "hex.publish": :docs, "hex.build": :docs}]

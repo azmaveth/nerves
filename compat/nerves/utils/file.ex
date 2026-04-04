@@ -8,16 +8,11 @@
 defmodule Nerves.Utils.File do
   @moduledoc false
 
-  @spec untar(String.t(), String.t() | nil) :: :ok | {:error, any}
-  def untar(file, destination \\ nil) do
-    destination = destination || File.cwd!()
-
-    cmd("tar", ["xf", file, "--strip-components=1", "-C", destination])
-    |> result()
-  end
-
   @doc """
   Create a tar of the contents of the path and specified output file
+
+  This hardcodes the tar file type to gzip and was advertised
+  as public API in the docs even though this module is `@moduledoc false`.
   """
   @spec tar(String.t(), String.t()) :: :ok | {:error, any}
   def tar(path, file) do
@@ -27,20 +22,6 @@ defmodule Nerves.Utils.File do
     cmd("tar", ["-czf", file, "-C", working_dir, path])
     |> result()
   end
-
-  @spec validate(String.t()) :: :ok | {:error, any}
-  def validate(file) do
-    Path.extname(file)
-    |> ext_cmd()
-    |> cmd(["-t", file])
-    |> result()
-  end
-
-  @doc false
-  @spec ext_cmd(String.t()) :: String.t()
-  def ext_cmd(".xz"), do: "xz"
-  def ext_cmd(".gz"), do: "gzip"
-  def ext_cmd(".tar"), do: "tar"
 
   defp result({"", 0}), do: :ok
   defp result({reason, _}), do: {:error, reason}

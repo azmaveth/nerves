@@ -36,7 +36,7 @@ defmodule Nerves.Artifact.Resolver do
   end
 
   defp validate_and_continue(file, resolvers, pkg) do
-    case Nerves.Utils.File.validate(file) do
+    case Nerves.Artifact.Archive.validate(file) do
       :ok ->
         {:ok, file}
 

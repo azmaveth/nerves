@@ -7,7 +7,6 @@
 defmodule Nerves.UtilsTest do
   use NervesTest.Case
 
-  alias Nerves.Utils
   alias Nerves.Utils.Proxy
 
   setup do
@@ -67,59 +66,5 @@ defmodule Nerves.UtilsTest do
              {:proxy, {{~c"http_proxy.com", 80}, []}},
              {:https_proxy, {{~c"https_proxy.com", 443}, []}}
            ]
-  end
-
-  test "create tar archives", context do
-    in_tmp(context.test, fn ->
-      cwd = File.cwd!()
-      content_path = Path.join(cwd, "content")
-      File.mkdir(content_path)
-      contents = Path.join(content_path, "file")
-      File.touch(contents)
-      archive = create_archive(content_path, cwd)
-      assert File.exists?(archive)
-    end)
-  end
-
-  test "decompress tar archives", context do
-    in_tmp(context.test, fn ->
-      cwd = File.cwd!()
-      content_path = Path.join(cwd, "content")
-      File.mkdir(content_path)
-      contents = Path.join(content_path, "file")
-      File.touch(contents)
-      archive = create_archive(content_path, cwd)
-      assert File.exists?(archive)
-      File.rm_rf!(content_path)
-      File.mkdir(content_path)
-      Utils.File.untar(archive, content_path)
-      assert File.exists?(contents)
-    end)
-  end
-
-  test "validate tar archives", context do
-    in_tmp(context.test, fn ->
-      cwd = File.cwd!()
-      archive_path = Path.join(cwd, "archive.tar.gz")
-
-      {_, 0} =
-        System.cmd("dd", ["if=/dev/urandom", "bs=1024", "count=1", "of=#{archive_path}"],
-          stderr_to_stdout: true
-        )
-
-      assert {:error, _} = Utils.File.validate(archive_path)
-    end)
-  end
-
-  test "validate extension programs" do
-    assert Utils.File.ext_cmd(".gz") == "gzip"
-    assert Utils.File.ext_cmd(".xz") == "xz"
-    assert Utils.File.ext_cmd(".tar") == "tar"
-  end
-
-  defp create_archive(content_path, cwd) do
-    file = "archive.tar.gz"
-    Utils.File.tar(content_path, file)
-    Path.join(cwd, file)
   end
 end

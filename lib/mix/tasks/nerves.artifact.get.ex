@@ -55,7 +55,7 @@ defmodule Mix.Tasks.Nerves.Artifact.Get do
     Nerves.Utils.Shell.success("  Checking #{pkg.app}...")
 
     with true <- File.exists?(archive),
-         :ok <- Nerves.Utils.File.validate(archive) do
+         :ok <- Nerves.Artifact.Archive.validate(archive) do
       Nerves.Utils.Shell.info("  => Trying #{archive}")
       put_cache(pkg, archive)
     else

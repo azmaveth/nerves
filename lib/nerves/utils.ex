@@ -22,10 +22,4 @@ defmodule Nerves.Utils do
     Enum.take_random(@alphanum, length)
     |> to_string()
   end
-
-  @spec untar(Path.t(), Path.t() | nil) :: {Collectable.t(), exit_status :: non_neg_integer()}
-  def untar(file, destination \\ nil) do
-    destination = destination || File.cwd!()
-    Nerves.Port.cmd("tar", ["xf", file, "--strip-components=1", "-C", destination])
-  end
 end

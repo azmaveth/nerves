@@ -10,10 +10,17 @@ defmodule Nerves.CacheTest do
   alias Nerves.Artifact
   alias Nerves.Artifact.Cache
 
+  defp create_tgz(path, contents) do
+    char_contents =
+      Enum.map(contents, fn {entry_path, entry_contents} ->
+        {to_charlist(entry_path), entry_contents}
+      end)
+
+    :ok = :erl_tar.create(to_charlist(path), char_contents, [:compressed])
+  end
+
   @tag :tmp_dir
   test "cache entries are created properly", %{tmp_dir: tmp} do
-    File.touch(Path.join(tmp, "tester"))
-
     package = %Nerves.Package{
       path: tmp,
       version: "0.1.0",
@@ -24,9 +31,7 @@ defmodule Nerves.CacheTest do
     artifact_name = Artifact.download_name(package) <> Artifact.ext(package)
     artifact_tar = Path.join(tmp, artifact_name)
 
-    Nerves.Utils.File.tar(tmp, artifact_tar)
-
-    assert File.exists?(artifact_tar)
+    create_tgz(artifact_tar, [{"artifact/tester", ""}])
 
     Cache.put(package, artifact_tar)
 
@@ -47,15 +52,7 @@ defmodule Nerves.CacheTest do
       dl_name = Nerves.Artifact.download_name(package) <> Nerves.Artifact.ext(package)
       dl_path = Path.join(Nerves.Env.download_dir(), dl_name)
       File.mkdir_p!(Nerves.Env.download_dir())
-
-      working_path = Path.join(File.cwd!(), "archive")
-      File.mkdir_p!(working_path)
-
-      working_path
-      |> Path.join("CHECKSUM")
-      |> File.write(Nerves.Artifact.checksum(package))
-
-      Nerves.Utils.File.tar(working_path, dl_path)
+      create_tgz(dl_path, [])
 
       System.delete_env("NERVES_SYSTEM")
 

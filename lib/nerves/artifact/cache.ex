@@ -31,7 +31,7 @@ defmodule Nerves.Artifact.Cache do
 
     if String.ends_with?(path, ext) do
       File.mkdir_p!(dest)
-      :ok = Nerves.Utils.File.untar(path, dest)
+      :ok = Nerves.Artifact.Archive.extract(path, dest)
     else
       Path.dirname(dest)
       |> File.mkdir_p!()
