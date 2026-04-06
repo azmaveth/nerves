@@ -12,24 +12,26 @@
 | target          | The platform for which your firmware is built (for example, Raspberry Pi Zero W, Raspberry Pi 4, or Beaglebone Black) |
 | toolchain       | The tools required to build code for the target, such as compilers, linkers, binutils, and C runtime                  |
 | system          | A lean Buildroot-based Linux distribution that has been customized and cross-compiled for a particular target         |
-| assemble        | The process of combining system, application, and configuration into a firmware bundle                                |
-| firmware bundle | A single file that contains an assembled version of everything needed to burn firmware                                |
-| firmware image  | Built from a firmware bundle and contains the partition table, partitions, bootloader, etc.                           |
+| firmware bundle | A single file with the extension `.fw` that contains your compiled application and everything else needed to run on your target |
+| firmware image  | Built from a firmware bundle. It's a raw representation on what's on the MicroSD card. These aren't used in normal development and firmware updates. |
 
 ## Nerves systems
 
-| Nerves system                                                                      | MIX_TARGET | Hardware                                                                         |
-| ---------------------------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------- |
-| [nerves_system_rpi](https://github.com/nerves-project/nerves_system_rpi)           | `rpi`      | Raspberry Pi A+, B, B+                                                           |
-| [nerves_system_rpi0](https://github.com/nerves-project/nerves_system_rpi0)         | `rpi0`     | Raspberry Pi Zero and Zero W                                                     |
-| [nerves_system_rpi2](https://github.com/nerves-project/nerves_system_rpi2)         | `rpi2`     | Raspberry Pi 2                                                                   |
-| [nerves_system_rpi3a](https://github.com/nerves-project/nerves_system_rpi3a)       | `rpi3a`    | Raspberry Pi 3A and Zero 2 W                                                     |
-| [nerves_system_rpi3](https://github.com/nerves-project/nerves_system_rpi3)         | `rpi3`     | Raspberry Pi 3 B, B+                                                             |
-| [nerves_system_rpi4](https://github.com/nerves-project/nerves_system_rpi4)         | `rpi4`     | Raspberry Pi 4                                                                   |
-| [nerves_system_bbb](https://github.com/nerves-project/nerves_system_bbb)           | `bbb`      | BeagleBone Black, BeagleBone Green, BeagleBone Green Wireless, and PocketBeagle. |
-| [nerves_system_x86_64](https://github.com/nerves-project/nerves_system_x86_64)     | `x86_64`   | Generic x86_64                                                                   |
-| [nerves_system_osd32mp1](https://github.com/nerves-project/nerves_system_osd32mp1) | `osd32mp1` | OSD32MP1                                                                         |
-| [nerves_system_grisp2](https://github.com/nerves-project/nerves_system_grisp2)     | `grisp2`   | GRiSP 2                                                                          |
+| Nerves system | MIX_TARGET | Hardware |
+| --- | --- | --- |
+| [nerves_system_rpi](https://github.com/nerves-project/nerves_system_rpi)                       | `rpi`             | Raspberry Pi A+, B, B+                                         |
+| [nerves_system_rpi0](https://github.com/nerves-project/nerves_system_rpi0)                     | `rpi0`            | Raspberry Pi Zero and Zero W                                   |
+| [nerves_system_rpi2](https://github.com/nerves-project/nerves_system_rpi2)                     | `rpi2`            | Raspberry Pi 2                                                 |
+| [nerves_system_rpi3](https://github.com/nerves-project/nerves_system_rpi3)                     | `rpi3`            | Raspberry Pi 3 B, B+                                           |
+| [nerves_system_rpi3a](https://github.com/nerves-project/nerves_system_rpi3a)                   | `rpi3a`           | Raspberry Pi 3A and Zero 2 W (32-bit)                          |
+| [nerves_system_rpi0_2](https://github.com/nerves-project/nerves_system_rpi0_2)                 | `rpi0_2`          | Raspberry Pi Zero 2 W and 3A (64-bit)                          |
+| [nerves_system_rpi4](https://github.com/nerves-project/nerves_system_rpi4)                     | `rpi4`            | Raspberry Pi 4                                                 |
+| [nerves_system_rpi5](https://github.com/nerves-project/nerves_system_rpi5)                     | `rpi5`            | Raspberry Pi 5                                                 |
+| [nerves_system_bbb](https://github.com/nerves-project/nerves_system_bbb)                       | `bbb`             | BeagleBone Black, Green, Green Wireless, and PocketBeagle      |
+| [nerves_system_osd32mp1](https://github.com/nerves-project/nerves_system_osd32mp1)             | `osd32mp1`        | OSD32MP1                                                       |
+| [nerves_system_x86_64](https://github.com/nerves-project/nerves_system_x86_64)                 | `x86_64`          | Generic x86_64                                                 |
+| [nerves_system_grisp2](https://github.com/nerves-project/nerves_system_grisp2)                 | `grisp2`          | GRiSP 2                                                        |
+| [nerves_system_mangopi_mq_pro](https://github.com/nerves-project/nerves_system_mangopi_mq_pro) | `mangopi_mq_pro`  | MangoPi MQ Pro                                                 |
 
 While the Nerves core team only officially supports the above hardware, the community has added support for other boards. See [Nerves Systems on
 hex.pm](https://hex.pm/packages?search=depends:nerves_system_br).
@@ -65,31 +67,22 @@ $ mix deps.get
 $ mix firmware
 ```
 
-#### Creating a bootable SD card
+#### Creating a bootable MicroSD card
 
 ```bash
 $ mix burn
 ```
 
-The `mix burn` command will attempt to automatically discover the SD card inserted in your host.
+The `mix burn` command discovers any MicroSD cards on your computer. It will confirm before writing the card.
 
 ### Uploading firmware to a Nerves device over SSH
-
-#### Using `mix upload`
 
 ```bash
 $ export MIX_TARGET=<target>
 $ mix upload nerves.local
 ```
 
-#### Using `./upload.sh`
-
-```bash
-$ mix firmware.gen.script
-
-$ export MIX_TARGET=<target>
-$ ./upload.sh nerves.local
-```
+Substitute `nerves.local` with `nerves-abcd.local` when you have multiple Nerves devices.
 
 ### Connecting to the target over SSH
 
@@ -109,7 +102,10 @@ $ ssh nerves.local
 
 #### Serial ports
 
-Nerves sends the iex prompt over a virtual serial port on the USB cable. It shows up as a device like `/dev/tty.usbmodem `or `/dev/ttyUSB0`.
+On boards with USB gadget support (e.g., rpi0, rpi0_2, bbb), the IEx prompt is
+available over a virtual serial port on the USB cable. Other boards (e.g.,
+rpi5) require a separate USB-to-serial adapter. Serial devices show up as
+`/dev/tty.usbmodem*` or `/dev/ttyUSB0`.
 
 #### Using screen
 
@@ -135,6 +131,12 @@ Exit `picocom` with CTRL+A, CTRL+X
 $ mix nerves.info
 ```
 
+#### Discovering Nerves devices on the local network
+
+```bash
+$ mix nerves.discover
+```
+
 #### Listing Nerves artifacts cached locally
 
 ```bash
@@ -146,6 +148,8 @@ $ ls ~/.nerves/artifacts
 ```bash
 $ ls ~/.nerves/dl
 ```
+
+> If `$XDG_DATA_HOME` is set, Nerves stores data under `$XDG_DATA_HOME/nerves/` instead of `~/.nerves`.
 
 ## Useful IEx commands
 
@@ -164,9 +168,9 @@ iex> NervesMOTD.print
 ### Logging
 
 ```elixir
-iex> Logger.configure level: :warn
 iex> log_attach
 iex> log_detach
+iex> RingLogger.viewer
 ```
 
 ### Linux commands
@@ -188,6 +192,6 @@ iex> h Toolshed
 iex> hostname
 iex> top
 iex> weather
-iex> history
+iex> cat "/proc/cpuinfo"
 iex> hex 255
 ```
