@@ -13,7 +13,7 @@
 | toolchain       | The tools required to build code for the target, such as compilers, linkers, binutils, and C runtime                  |
 | system          | A lean Buildroot-based Linux distribution that has been customized and cross-compiled for a particular target         |
 | firmware bundle | A single file with the extension `.fw` that contains your compiled application and everything else needed to run on your target |
-| firmware image  | Built from a firmware bundle. It's a raw representation on what's on the MicroSD card. These aren't used in normal development and firmware updates. |
+| firmware image  | Built from a firmware bundle. It's a raw representation of what's on the MicroSD card. These aren't used in normal development and firmware updates. |
 
 ## Nerves systems
 
@@ -179,7 +179,7 @@ iex> RingLogger.viewer
 iex> cmd "ps"
 ```
 
-### Reverse	search
+### Reverse search
 
 ```
 <CTRL+R>text to find
